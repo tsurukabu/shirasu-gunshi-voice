@@ -5,12 +5,24 @@
 .voice-intro{background:linear-gradient(125deg,#263c4d,#172a37);border:1px solid #b78f4f;border-radius:12px;padding:12px 14px;margin:12px 0}
 .voice-intro p{margin:4px 0}
 @media(max-width:760px){.gunshi-version{display:block;margin:6px 0 0;width:max-content;font-size:12px}}
+
+.record-countdown{padding:18px 10px;margin:10px 0;border:2px solid #e4b75b;background:#263440;text-align:center;border-radius:14px}
+.record-countdown #countNumber{font-size:76px;line-height:1.15;font-weight:800;color:#f5d38b;font-variant-numeric:tabular-nums}
+.record-countdown p{margin:4px 0 12px;font-weight:bold}
+.record-countdown button{padding:10px 20px}
+.rec-live{background:#51191e;color:#ffb6bd;border:1px solid #ff5265;border-radius:10px;font-weight:800;padding:12px;margin:10px 0;text-align:center;letter-spacing:.5px}
+
+#recordCountdown{position:fixed!important;inset:0;z-index:100000;background:rgba(8,18,27,.97)!important;display:flex;flex-direction:column;justify-content:center;align-items:center;border:none;border-radius:0;margin:0;padding:30px;color:#fff}
+#recordCountdown[hidden]{display:none!important}
+#recordCountdown #countNumber{font-size:clamp(100px,24vw,200px)!important;line-height:1.1!important;font-weight:900}
+#recordCountdown p{font-size:22px}
+#recordCountdown button{font-size:18px;padding:14px 32px}
 </style>
 <header><div><h1>しらす式 動く作戦図 <span class="gunshi-version">軍師の声Ver.</span></h1><small>進軍ルートを描き、軍師の解説を録音して動画にする</small></div><select id="battlefield" aria-label="作戦モード"><option value="fort">砦モード</option><option value="castle">城モード</option></select></header>
 <section id="startScreen" class="panel" style="max-width:720px;margin:20px auto;padding:28px"><h2>しらす式 動く作戦図｜軍師の声Ver.</h2><div class="voice-intro"><p><b>① スクショを選ぶ → ② 作戦を描く → ③ 軍師の声を録音 → ④ 動画を書き出す</b></p><p class="hint">通常版とは別の作戦図です。通常版のGitHubには上書きしないでください。</p></div><p>ゲームのマップをスクショして、写真に保存してください。<br>下のボタンで保存したスクショを選ぶと、作戦図を作れます。</p><button id="chooseStart" class="primary">写真からスクショを選ぶ</button><div class="row"><button id="loadStart">保存した作戦を開く</button></div><p id="startStatus" role="status" class="hint">画像を選ぶまでは作戦図を表示しません。</p></section><main id="editor" hidden><section class="panel"><label for="operationName">作戦名（保存画像にも表示）</label><input id="operationName" placeholder="例：A砦防衛作戦" maxlength="40" style="width:100%;margin-bottom:12px"><div class="row"><button id="quickBoss" class="primary">総大将を置く</button><button id="freePen">自由線</button><button id="textTool">文字入力</button><input id="ink" type="color" value="#ffe066" aria-label="書き込みの色"><select id="penWidth" aria-label="線の太さ"><option value="4">細い線</option><option value="8" selected>標準の線</option><option value="14">太い線</option></select><select id="textSize" aria-label="文字サイズ"><option value="20">小さい文字</option><option value="28" selected>標準の文字</option><option value="40">大きい文字</option></select></div><div class="row"><input id="mapText" placeholder="文字を入力 → 地図をタップ" maxlength="60" style="flex:1;min-width:150px"><button id="putText">文字を置く</button></div><div class="row" id="editTargets" aria-label="編集する対象"></div><p id="editingLabel" class="badge"></p><canvas id="map" width="1000" height="986" aria-label="作戦図。ルートモードでドラッグして描画"></canvas><div class="row"><button id="play" class="primary">▶ 再生</button><button id="pause">一時停止</button><button id="reset">先頭へ</button></div><input id="seek" type="range" min="0" max="1" step=".001" value="0" aria-label="再生位置"><div class="hint">選んだ部隊の出発地点から、進軍ルートを指でなぞってください。</div></section>
 <aside class="panel"><div id="castlePanel" hidden><p class="badge">攻め＝青／守り＝赤<br>攻略目標：城壁・楼城</p><label>井闌車を選ぶ</label><select id="warehouse"></select><input id="capture" type="number" value="0" hidden><label>井闌車の線の終点（画像上端から％）</label><input id="siegeEnd" type="number" min="0" max="100" value="12"><input id="siegeTime" type="number" value="20" hidden><div class="row"><button id="placeSiege">井闌車を置く</button><button id="deleteWarehouse">井闌車を削除</button></div><p class="hint">井闌車は配置マークと真上の線だけを表示し、再生中も動きません。線の終点は配置場所より上に設定してください。</p><div class="row"><button id="newSiege">単独の井闌車を追加</button></div><hr></div><p id="fortGoal" class="badge">攻略目標：敵総大将</p><label>作戦の部隊数</label><select id="count"><option value="1">Aのみ</option><option value="2">A・B</option><option value="3">A・B・C</option><option value="4">A・B・C・D</option></select><label>② 部隊を選ぶ</label><div class="row units" id="units"></div><label>この部隊の進み方</label><select id="split"><option value="1">1ルート</option><option value="2">二手に分ける（2ルート）</option><option value="3">三手に分ける（3ルート）</option></select><div class="row" id="branchButtons" hidden><button id="branch1">ルート1</button><button id="branch2">ルート2</button><button id="branch3">ルート3</button></div><div id="branchHint" class="hint"></div><label>到着後の行動</label><select id="arrivalAction"><option value="attack">攻撃する</option><option value="defend">防衛する（盾マーク）</option></select><p class="hint">ルートごとに設定できます。防衛は盾と「防衛」の表示で区別します。</p><label>選択ルートの人数</label><input id="people" type="number" min="0" max="999" placeholder="未入力なら表示しません"><label>出発までの待ち時間（秒）</label><input id="delay" type="number" min="0" max="120" value="0"><label>途中の待機時間（秒）</label><input id="hold" type="number" min="0" max="120" value="0"><label>待機する位置 <span id="holdLabel">50</span>％</label><input id="holdAt" type="range" min="0" max="100" value="50"><p class="hint">待機地点はスライダー、または「待機地点を指定」でルート上をタップして選べます。待機後は自動で再出発します。</p><label>③ 書き込み方法</label><select id="mode"><option value="route">進軍ルート（指でなぞる）</option><option value="free">自由線（指で描く）</option><option value="note">文字（地点をタップ）</option><option value="placeSiege">井闌車を置く（城・真上に線）</option><option value="enemyBoss">敵総大将を置く（タップ）</option><option value="enemyStrong">強敵を置く（タップ）</option><option value="enemyErase">敵マークを消す（タップ）</option><option value="wait">待機地点を指定（ルート上をタップ）</option><option value="ring">強調 ◎（地点をタップ）</option></select><input id="note" placeholder="例：詰所・森を封鎖" maxlength="30" style="margin-top:8px;width:100%"><p class="hint">ルートは出発地点から到着地点へなぞります。選択したルートを描き直します。二手に分けるときは、各ルートをそれぞれ描いてください。同じ出発地点から描けば二方向へ分かれて進みます。</p><div class="row"><button id="undo">一つ戻す</button><button id="clearUnit">選択ルート削除</button></div><label>再生速度</label><select id="rate"><option value="1" selected>1倍速</option><option value="2">2倍速</option><option value="4">4倍速</option><option value="8">8倍速</option></select><label>部隊の移動時間 <span id="seconds">12</span>秒</label><input id="duration" type="range" min="4" max="30" value="12"><p class="hint" id="totalTime"></p><hr><div class="row"><label>動画に入れる音声</label><input id="audioUpload" type="file" accept="audio/*"><audio id="audioPreview" controls hidden style="width:100%;margin:8px 0"></audio><div class="row"><button id="useFixedAudio">固定音声に戻す</button><button id="clearAudio">音声を外す</button></div><p id="audioInfo" class="hint">音声なし。MP3・M4A・WAVなどを選択できます。</p><p class="hint">固定音声は最初から設定されています。別の音声を選んだ場合、その音声は作戦JSONに含まれません。</p><section style="padding:12px;border:1px solid #708c9b;border-radius:10px;margin:10px 0">
-<strong>🎙 軍師の声｜作戦解説を録音</strong><p class="hint">作戦を最初から再生しながらマイク録音します。動画作成時に録音した声を重ねます。</p>
-<div class="row"><button id="narrateStart" class="primary">🎙 録音しながら再生</button><button id="narrateStop" disabled>■ 録音終了</button><button id="narrateClear" disabled>録音を削除</button></div>
+<strong>🎙 軍師の声｜作戦解説を録音</strong><p style="color:#f5d38b;font-weight:bold" id="countdownVersion">カウントダウン改良版 v2｜開始前に大きく5秒表示</p><p class="hint">作戦を最初から再生しながらマイク録音します。動画作成時に録音した声を重ねます。</p>
+<div id="recordCountdown" class="record-countdown" hidden aria-live="polite"><div id="countNumber">5</div><p>録音開始まで</p><button id="cancelCountdown" type="button">キャンセル</button></div><div id="recLive" class="rec-live" hidden aria-live="polite">● REC　録音中</div><div class="row"><button id="narrateStart" class="primary">🎙 5秒後に録音・再生</button><button id="narrateStop" disabled>■ 録音終了</button><button id="narrateClear" disabled>録音を削除</button></div>
 <p id="narrateStatus" class="hint" role="status">まだ軍師の声は録音されていません。録音後に動画へ合成できます。</p>
 <audio id="narratePreview" controls hidden style="width:100%"></audio>
 <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mixMusic" checked>固定BGMも動画に入れる（録音と同時に使用）</label>
@@ -96,14 +108,23 @@ for(const id of ['pause','reset']){const before=$(id).onclick;$(id).onclick=()=>
 // Narration extension for standalone しらす式作戦図
 let narrationBlob=null, narrationURL=null, narrationRate=1, narrationRecorder=null;
 let narrationMic=null,narrationWatch=0,narrationBusy=false;
+let narrationCountdownTimer=null,narrationPreparing=false,narrationCancelled=false;
+function stopNarrationCountdown(){if(narrationCountdownTimer!==null){clearInterval(narrationCountdownTimer);narrationCountdownTimer=null;}$('recordCountdown').hidden=true}
+function cancelNarrationCountdown(){
+ narrationCancelled=true;stopNarrationCountdown();narrationPreparing=false;narrationBusy=false;
+ if(narrationMic){narrationMic.getTracks().forEach(t=>t.stop());narrationMic=null}
+ narrationRecorder=null;$('recLive').hidden=true;
+ narrationUI('録音開始をキャンセルしました。');
+}
+$('cancelCountdown').onclick=cancelNarrationCountdown;
 function narrationUI(message){$('narrateStatus').textContent=message;
- $('narrateStart').disabled=narrationBusy||recording;
+ $('narrateStart').disabled=narrationBusy||narrationPreparing||recording;
  $('narrateStop').disabled=!narrationBusy;
  $('narrateClear').disabled=narrationBusy||!narrationBlob;
 }
 function clearNarration(){if(narrationURL)URL.revokeObjectURL(narrationURL);narrationURL=null;narrationBlob=null;$('narratePreview').hidden=true;$('narratePreview').removeAttribute('src');$('narratePreview').load();narrationUI('録音なし。')}
 $('narrateClear').onclick=clearNarration;
-function finishNarration(){if(!narrationBusy)return;narrationBusy=false;cancelAnimationFrame(narrationWatch);
+function finishNarration(){if(!narrationBusy)return;narrationBusy=false;$('recLive').hidden=true;cancelAnimationFrame(narrationWatch);
  if(narrationRecorder&&narrationRecorder.state!=='inactive')narrationRecorder.stop();
  if(narrationMic){narrationMic.getTracks().forEach(t=>t.stop());narrationMic=null;}
  playing=false;draw();narrationUI('録音を処理しています…');}
@@ -113,39 +134,57 @@ function narrationMonitor(){if(!narrationBusy)return;
  narrationWatch=requestAnimationFrame(narrationMonitor);
 }
 $('narrateStart').onclick=async()=>{
- if(recording||narrationBusy)return;
+ if(recording||narrationBusy||narrationPreparing)return;
  if(!imageSrc){status('先に作戦のスクショを読み込んでください。');return}
  if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){narrationUI('このブラウザはマイク録音に対応していません。Safariなどでお試しください。');return}
+ narrationCancelled=false;narrationPreparing=true;narrationUI('マイクの利用を許可してください。');
  try {
   const mic=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true},video:false});
+  if(narrationCancelled){mic.getTracks().forEach(t=>t.stop());return}
   const mime=['audio/mp4','audio/webm;codecs=opus','audio/webm'].find(x=>MediaRecorder.isTypeSupported(x));
   const rec=mime?new MediaRecorder(mic,{mimeType:mime}):new MediaRecorder(mic);
-  if(narrationURL)URL.revokeObjectURL(narrationURL);
-  narrationBlob=null;narrationURL=null;narrationMic=mic;narrationRecorder=rec;narrationRate=+$('rate').value;
-  $('narratePreview').hidden=true;
+  narrationMic=mic;narrationRecorder=rec;narrationRate=+$('rate').value;
+  // The previous recording remains intact until the countdown completes.
   const chunks=[];rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
   rec.onstop=()=>{if(!chunks.length){narrationUI('音声データを保存できませんでした。もう一度録音してください。');return}
    narrationBlob=new Blob(chunks,{type:rec.mimeType||'audio/mp4'});
    narrationURL=URL.createObjectURL(narrationBlob);
    $('narratePreview').src=narrationURL;$('narratePreview').hidden=false;
    narrationUI('録音完了。▶で確認できます。「動画を書き出す」で声が反映されます。');};
-  rec.onerror=()=>{narrationBusy=false;mic.getTracks().forEach(t=>t.stop());narrationUI('マイク録音に失敗しました。')};
-  $('audioPreview').pause();$('audioPreview').currentTime=0;
-  $('narratePreview').pause();
-  progress=0;draw();
-  rec.start(250);narrationBusy=true;
-  // Start animation from frame zero; existing normal playback includes BGM, so run it silently.
-  const prevURL=selectedAudioURL;selectedAudioURL=null;
-  try{silentPlay()}finally{selectedAudioURL=prevURL}
-  narrationUI('● 録音中：作戦に合わせて話してください。自動終了、または「録音終了」。');
-  narrationWatch=requestAnimationFrame(narrationMonitor);
- }catch(e){if(narrationMic){narrationMic.getTracks().forEach(t=>t.stop());narrationMic=null}
-  narrationBusy=false;narrationUI('録音を開始できません：'+(e.message||'マイクの権限を確認してください。'));}
+  rec.onerror=()=>{narrationBusy=false;$('recLive').hidden=true;mic.getTracks().forEach(t=>t.stop());narrationUI('マイク録音に失敗しました。')};
+  $('audioPreview').pause();$('narratePreview').pause();
+  playing=false;progress=0;draw();
+  // The recorder must not begin until the countdown reaches zero.
+  let remaining=5;$('countNumber').textContent=remaining;
+  $('recordCountdown').hidden=false;
+  narrationUI('5秒後に録音と部隊の再生を同時に開始します。準備中は録音されません。');
+  narrationCountdownTimer=setInterval(()=>{
+   if(narrationCancelled){stopNarrationCountdown();return}
+   remaining--;
+   if(remaining>0){$('countNumber').textContent=remaining;return}
+   stopNarrationCountdown();narrationPreparing=false;
+   if(narrationCancelled)return;
+   try{
+    if(narrationURL)URL.revokeObjectURL(narrationURL);
+    narrationURL=null;narrationBlob=null;$('narratePreview').hidden=true;
+    rec.start(250);narrationBusy=true;$('recLive').hidden=false;
+    // Begin timeline immediately after microphone recorder starts. Keep BGM silent during narration.
+    const prevURL=selectedAudioURL;selectedAudioURL=null;
+    try{silentPlay()}finally{selectedAudioURL=prevURL}
+    narrationUI('● REC 録音中：作戦に合わせて話してください。「録音終了」で停止できます。');
+    narrationWatch=requestAnimationFrame(narrationMonitor);
+   }catch(e){narrationBusy=false;$('recLive').hidden=true;mic.getTracks().forEach(t=>t.stop());narrationMic=null;narrationUI('録音を開始できません：'+(e.message||e))}
+  },1000);
+ }catch(e){
+  stopNarrationCountdown();narrationPreparing=false;
+  if(narrationMic){narrationMic.getTracks().forEach(t=>t.stop());narrationMic=null}
+  narrationUI('録音を開始できません：'+(e.message||'マイクの権限を確認してください。'));
+ }
 };
 // Prevent timeline changes and video export while recording spoken commentary.
 for(const id of ['play','pause','reset','seek','rate','duration','record']){
  const el=$(id);const event=id==='seek'||id==='duration'?'oninput':id==='rate'?'onchange':'onclick';
- const old=el[event];el[event]=function(...args){if(narrationBusy){status('音声録音中は進行を変更できません。「録音終了」を押してください。');return}return old?.apply(this,args)};
+ const old=el[event];el[event]=function(...args){if(narrationBusy||narrationPreparing){status('録音の準備中・録音中は進行を変更できません。');return}return old?.apply(this,args)};
 }
 // When exporting, create one mixed audio track with narration plus optional BGM.
 const previousPrepareVideoAudio=prepareVideoAudio;
