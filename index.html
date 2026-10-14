@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>しらす式 動く作戦図｜軍師の声Ver. 録音修正版 v7</title>
+<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>しらす式 動く作戦図｜軍師の声Ver.</title>
 <style>[hidden]{display:none!important}*{box-sizing:border-box}body{margin:0;background:#101820;color:#eef1f5;font:15px system-ui,sans-serif}header,main{max-width:1160px;margin:auto;padding:18px}header{display:flex;align-items:center;justify-content:space-between}h1{font-size:22px;margin:0}small,.hint{color:#a9bbca}main{display:grid;grid-template-columns:1fr 300px;gap:20px;padding-top:0}.panel{background:#1a2733;border:1px solid #344352;border-radius:14px;padding:16px}canvas{width:100%;display:block;border-radius:10px;touch-action:none}button,select,input{font:inherit;border-radius:8px;border:1px solid #526474;padding:10px;background:#233747;color:white;max-width:100%}button{cursor:pointer}button.primary{background:#e4b75b;color:#18212a;font-weight:700}button:disabled{opacity:.45;cursor:wait}.row{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}label{display:block;margin:14px 0 5px}input[type=range]{width:100%}p{line-height:1.6}.hint{font-size:13px}.badge{color:#f3c66b}a{color:#f3c66b}.units button{flex:1;padding:11px 4px}.units button.active{outline:3px solid #e4b75b}#status{min-height:45px;color:#f3c66b}hr{border:0;border-top:1px solid #344352;margin:18px 0}@media(max-width:760px){main{grid-template-columns:1fr}header{align-items:start;gap:8px}h1{font-size:18px}main,header{padding:12px}}
 .gunshi-version{display:inline-block;margin-left:4px;padding:3px 9px;border:1px solid #e4b75b;border-radius:999px;color:#f6d48d;font-size:14px;white-space:nowrap;vertical-align:middle}
 #narrateStart{min-height:48px}
@@ -62,7 +62,7 @@ $('png').onclick=()=>canvas.toBlob(b=>download(b,'作戦図.png'));$('save').onc
 function setImage(src){status('画像を読み込んでいます…');image.onload=()=>{imageSrc=src;canvas.height=Math.round(1000*image.naturalHeight/image.naturalWidth);$('startScreen').hidden=true;$('editor').hidden=false;draw();status('部隊数を選び、ルートを描いてください。')};image.onerror=()=>status('画像を読み込めませんでした。別の画像を選んでください。');image.src=src}
 $('json').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());if(!d.plan||d.plan.routes.length!==4||!d.plan.routes.every(r=>Array.isArray(r)&&r.every(p=>p.length===2&&p.every(v=>Number.isFinite(v)&&v>=0&&v<=1)))||!Array.isArray(d.plan.notes)||!Array.isArray(d.plan.rings)||typeof d.imageSrc!=='string'||(!d.imageSrc.startsWith('data:image/')&&d.imageSrc!=='map.jpg'))throw Error();if(!d.plan.secondary)d.plan.secondary=[[],[],[],[]];if(!d.plan.tertiary)d.plan.tertiary=[[],[],[],[]];if(!d.plan.splits)d.plan.splits=[1,1,1,1];if(d.plan.secondary.length!==4||d.plan.tertiary.length!==4||![...d.plan.secondary,...d.plan.tertiary].every(r=>Array.isArray(r)&&r.every(p=>Array.isArray(p)&&p.length===2&&p.every(v=>Number.isFinite(v)&&v>=0&&v<=1)))||d.plan.splits.length!==4||!d.plan.splits.every(v=>v===1||v===2||v===3))throw Error();if(!d.plan.settings)d.plan.settings=initial().settings;if(d.plan.settings.length!==4||!d.plan.settings.every(row=>Array.isArray(row)&&row.length===3&&row.every(s=>s&&['delay','hold','holdAt'].every(k=>Number.isFinite(s[k])&&s[k]>=0&&s[k]<=(k==='holdAt'?1:120))&&(s.people===null||(Number.isInteger(s.people)&&s.people>=0&&s.people<=999)))))throw Error();if(!d.plan.enemies)d.plan.enemies=[];if(!Array.isArray(d.plan.enemies)||!d.plan.enemies.every(o=>o&&['boss','strong'].includes(o.type)&&Array.isArray(o.p)&&o.p.length===2&&o.p.every(v=>Number.isFinite(v)&&v>=0&&v<=1)))throw Error();if(!d.plan.warehouses)d.plan.warehouses=[];if(!d.plan.targets)d.plan.targets=[];if(!['fort','castle'].includes(d.plan.battlefield))d.plan.battlefield='fort';validateCastle(d.plan);validateAnnotations(d.plan);snapshot();plan=d.plan;$('count').value=[1,2,3,4].includes(d.count)?String(d.count):'4';selected=0;highlight();$('battlefield').value=plan.battlefield;$('rate').value=[1,2,4,8].includes(d.rate)?String(d.rate):'1';syncCastle();playing=false;progress=0;$('duration').value=Math.max(4,Math.min(30,d.duration||12));$('seconds').textContent=$('duration').value;setImage(d.imageSrc);status('作戦を読み込みました。')}catch{status('作戦ファイルを確認してください。')}e.target.value=''};
 $('upload').onchange=e=>{if(recording)return;const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{history=[];plan=initial();selected=0;highlight();playing=false;progress=0;setImage(r.result)};r.readAsDataURL(f)};$('sample').onclick=()=>{if(recording)return;snapshot();plan=initial();selected=0;highlight();progress=0;playing=false;draw()};
-$('record').onclick=async()=>{if(recording)return;if(!canvas.captureStream||!window.MediaRecorder){status('この端末では動画書き出し非対応です。画面収録をご利用ください。');return}const mime=['video/mp4','video/webm;codecs=vp9','video/webm'].find(m=>MediaRecorder.isTypeSupported(m));if(!mime){status('この端末では動画書き出しに対応していません。');return}let stream,rec,audioSession;try{stream=canvas.captureStream(30);audioSession=await prepareVideoAudio(stream);rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:5000000})}catch(err){status('動画の録画を開始できません：'+(err.message||'音声や端末の対応をご確認ください')); if(audioSession)audioSession.cleanup();if(stream)stream.getTracks().forEach(t=>t.stop());return}recording=true;const controls=[...document.querySelectorAll('button,input,select')];controls.forEach(c=>c.disabled=true);let chunks=[],timer;function cleanup(){clearTimeout(timer);if(audioSession)audioSession.cleanup();stream.getTracks().forEach(t=>t.stop());recording=false;playing=false;controls.forEach(c=>c.disabled=false)}rec.ondataavailable=e=>{if(e.data&&e.data.size>0)chunks.push(e.data)};rec.onstop=()=>{cleanup();download(new Blob(chunks,{type:mime}),'作戦動画.'+(mime.includes('mp4')?'mp4':'webm'));status('動画を保存しました。')};rec.onerror=()=>{cleanup();status('録画に失敗しました。画面収録をご利用ください。')};progress=0;draw();rec.start();if(audioSession)audioSession.play();start=performance.now();playing=true;status('動画を書き出しています… この画面を開いたままお待ちください。');timer=setTimeout(()=>{if(rec.state==='recording')rec.stop()},Math.max(totalSeconds()/+$('rate').value,audioSession?.duration||0)*1000+500)};
+$('record').onclick=async()=>{if(recording)return;if(!canvas.captureStream||!window.MediaRecorder){status('この端末では動画書き出し非対応です。画面収録をご利用ください。');return}const mime=['video/mp4','video/webm;codecs=vp9','video/webm'].find(m=>MediaRecorder.isTypeSupported(m));if(!mime){status('この端末では動画書き出しに対応していません。');return}let stream,rec,audioSession;try{stream=canvas.captureStream(30);audioSession=await prepareVideoAudio(stream);rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:5000000})}catch(err){status('動画の録画を開始できません：'+(err.message||'音声や端末の対応をご確認ください')); if(audioSession)audioSession.cleanup();if(stream)stream.getTracks().forEach(t=>t.stop());return}recording=true;const controls=[...document.querySelectorAll('button,input,select')];controls.forEach(c=>c.disabled=true);let chunks=[],timer;function cleanup(){clearTimeout(timer);if(audioSession)audioSession.cleanup();stream.getTracks().forEach(t=>t.stop());recording=false;playing=false;controls.forEach(c=>c.disabled=false)}rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};rec.onstop=()=>{cleanup();download(new Blob(chunks,{type:mime}),'作戦動画.'+(mime.includes('mp4')?'mp4':'webm'));status('動画を保存しました。')};rec.onerror=()=>{cleanup();status('録画に失敗しました。画面収録をご利用ください。')};progress=0;draw();rec.start();if(audioSession)audioSession.play();start=performance.now();playing=true;status('動画を書き出しています… この画面を開いたままお待ちください。');timer=setTimeout(()=>{if(rec.state==='recording')rec.stop()},Math.max(totalSeconds()/+$('rate').value,audioSession?.duration||0)*1000+500)};
 $('chooseStart').onclick=$('chooseChange').onclick=()=>{if(!recording)$('upload').click()};$('loadStart').onclick=()=> $('json').click();
 
 </script><script>
@@ -129,20 +129,10 @@ function narrationUI(message){$('narrateStatus').textContent=message;
 }
 function clearNarration(){if(narrationURL)URL.revokeObjectURL(narrationURL);narrationURL=null;narrationBlob=null;$('narratePreview').hidden=true;$('narratePreview').removeAttribute('src');$('narratePreview').load();narrationUI('録音なし。')}
 $('narrateClear').onclick=clearNarration;
-function finishNarration(){
- if(!narrationBusy)return;
- narrationBusy=false;cancelAnimationFrame(narrationWatch);
- playing=false;draw();narrationUI('録音を保存しています…');
- // iOS: leave microphone tracks alive until MediaRecorder's final dataavailable/onstop.
- try {
-  if(narrationRecorder&&narrationRecorder.state!=='inactive')narrationRecorder.stop();
-  else {narrationUI('録音器が停止していました。録音し直してください。');releaseNarrationMic();}
- }catch(err){narrationUI('録音終了エラー：'+err.message);releaseNarrationMic()}
-}
-function releaseNarrationMic(){
+function finishNarration(){if(!narrationBusy)return;narrationBusy=false;$('recLive').hidden=true;cancelAnimationFrame(narrationWatch);
+ if(narrationRecorder&&narrationRecorder.state!=='inactive')narrationRecorder.stop();
  if(narrationMic){narrationMic.getTracks().forEach(t=>t.stop());narrationMic=null;}
- $('recLive').hidden=true;
-}
+ playing=false;draw();narrationUI('録音を処理しています…');}
 $('narrateStop').onclick=finishNarration;
 function narrationMonitor(){if(!narrationBusy)return;
  if(progress>=1){finishNarration();return}
@@ -162,19 +152,13 @@ $('narrateStart').onclick=async()=>{
   const rec=mime?new MediaRecorder(mic,{mimeType:mime}):new MediaRecorder(mic);
   narrationMic=mic;narrationRecorder=rec;narrationRate=+$('rate').value;
   // The previous recording remains intact until the countdown completes.
-  const chunks=[];rec.ondataavailable=e=>{if(e.data&&e.data.size>0)chunks.push(e.data)};
-  rec.onstop=()=>{
-   releaseNarrationMic();
-   if(!chunks.length){narrationUI('録音データが空でした。iPhoneのマイク許可を確認して再録音してください。');return}
-   const blob=new Blob(chunks,{type:rec.mimeType||chunks[0].type||'audio/mp4'});
-   if(blob.size<1000){narrationUI('録音データが小さすぎます（'+blob.size+'バイト）。もう一度試してください。');return}
-   if(narrationURL)URL.revokeObjectURL(narrationURL);
-   narrationBlob=blob;narrationURL=URL.createObjectURL(blob);
+  const chunks=[];rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+  rec.onstop=()=>{if(!chunks.length){narrationUI('音声データを保存できませんでした。もう一度録音してください。');return}
+   narrationBlob=new Blob(chunks,{type:rec.mimeType||'audio/mp4'});
+   narrationURL=URL.createObjectURL(narrationBlob);
    $('narratePreview').src=narrationURL;$('narratePreview').hidden=false;
-   $('narratePreview').load();
-   narrationUI('軍師の声を保存しました（'+Math.round(blob.size/1024)+'KB）。▶で声を確認してください。');
-  };
-  rec.onerror=e=>{narrationBusy=false;releaseNarrationMic();narrationUI('マイク録音エラー：'+(e.error?.name||'不明なエラー'))};
+   narrationUI('軍師の声の録音を保存しました（'+Math.round(narrationBlob.size/1024)+'KB）。▶で声が聞こえるか確認してから動画を書き出してください。');};
+  rec.onerror=()=>{narrationBusy=false;$('recLive').hidden=true;mic.getTracks().forEach(t=>t.stop());narrationUI('マイク録音に失敗しました。')};
   $('audioPreview').pause();$('narratePreview').pause();
   playing=false;progress=0;draw();
   // The recorder must not begin until the countdown reaches zero.
@@ -190,11 +174,11 @@ $('narrateStart').onclick=async()=>{
    try{
     if(narrationURL)URL.revokeObjectURL(narrationURL);
     narrationURL=null;narrationBlob=null;$('narratePreview').hidden=true;
-    rec.start();narrationBusy=true;$('recLive').hidden=false;
+    rec.start(250);narrationBusy=true;$('recLive').hidden=false;
     // Begin timeline immediately after microphone recorder starts. Keep BGM silent during narration.
     const prevURL=selectedAudioURL;selectedAudioURL=null;
     try{silentPlay()}finally{selectedAudioURL=prevURL}
-    narrationUI('● REC 録音中：マイク稼働中。録音終了後に▶で確認できます。');
+    narrationUI('● REC 録音中：作戦に合わせて話してください。「録音終了」で停止できます。');
     narrationWatch=requestAnimationFrame(narrationMonitor);
    }catch(e){narrationBusy=false;$('recLive').hidden=true;mic.getTracks().forEach(t=>t.stop());narrationMic=null;narrationUI('録音を開始できません：'+(e.message||e))}
   },1000);
