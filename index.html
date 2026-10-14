@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>しらす式 動く作戦図｜軍師の声Ver.</title>
+<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>しらす式 動く作戦図｜軍師の声Ver. WAV録音修正版 v8</title>
 <style>[hidden]{display:none!important}*{box-sizing:border-box}body{margin:0;background:#101820;color:#eef1f5;font:15px system-ui,sans-serif}header,main{max-width:1160px;margin:auto;padding:18px}header{display:flex;align-items:center;justify-content:space-between}h1{font-size:22px;margin:0}small,.hint{color:#a9bbca}main{display:grid;grid-template-columns:1fr 300px;gap:20px;padding-top:0}.panel{background:#1a2733;border:1px solid #344352;border-radius:14px;padding:16px}canvas{width:100%;display:block;border-radius:10px;touch-action:none}button,select,input{font:inherit;border-radius:8px;border:1px solid #526474;padding:10px;background:#233747;color:white;max-width:100%}button{cursor:pointer}button.primary{background:#e4b75b;color:#18212a;font-weight:700}button:disabled{opacity:.45;cursor:wait}.row{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}label{display:block;margin:14px 0 5px}input[type=range]{width:100%}p{line-height:1.6}.hint{font-size:13px}.badge{color:#f3c66b}a{color:#f3c66b}.units button{flex:1;padding:11px 4px}.units button.active{outline:3px solid #e4b75b}#status{min-height:45px;color:#f3c66b}hr{border:0;border-top:1px solid #344352;margin:18px 0}@media(max-width:760px){main{grid-template-columns:1fr}header{align-items:start;gap:8px}h1{font-size:18px}main,header{padding:12px}}
 .gunshi-version{display:inline-block;margin-left:4px;padding:3px 9px;border:1px solid #e4b75b;border-radius:999px;color:#f6d48d;font-size:14px;white-space:nowrap;vertical-align:middle}
 #narrateStart{min-height:48px}
@@ -21,7 +21,7 @@
 <header><div><h1>しらす式 動く作戦図 <span class="gunshi-version">軍師の声Ver.</span></h1><small>進軍ルートを描き、軍師の解説を録音して動画にする</small></div><select id="battlefield" aria-label="作戦モード"><option value="fort">砦モード</option><option value="castle">城モード</option></select></header>
 <section id="startScreen" class="panel" style="max-width:720px;margin:20px auto;padding:28px"><h2>しらす式 動く作戦図｜軍師の声Ver.</h2><div class="voice-intro"><p><b>① スクショを選ぶ → ② 作戦を描く → ③ 軍師の声を録音 → ④ 動画を書き出す</b></p><p class="hint">通常版とは別の作戦図です。通常版のGitHubには上書きしないでください。</p></div><p>ゲームのマップをスクショして、写真に保存してください。<br>下のボタンで保存したスクショを選ぶと、作戦図を作れます。</p><button id="chooseStart" class="primary">写真からスクショを選ぶ</button><div class="row"><button id="loadStart">保存した作戦を開く</button></div><p id="startStatus" role="status" class="hint">画像を選ぶまでは作戦図を表示しません。</p></section><main id="editor" hidden><section class="panel"><label for="operationName">作戦名（保存画像にも表示）</label><input id="operationName" placeholder="例：A砦防衛作戦" maxlength="40" style="width:100%;margin-bottom:12px"><div class="row"><button id="quickBoss" class="primary">総大将を置く</button><button id="freePen">自由線</button><button id="textTool">文字入力</button><input id="ink" type="color" value="#ffe066" aria-label="書き込みの色"><select id="penWidth" aria-label="線の太さ"><option value="4">細い線</option><option value="8" selected>標準の線</option><option value="14">太い線</option></select><select id="textSize" aria-label="文字サイズ"><option value="20">小さい文字</option><option value="28" selected>標準の文字</option><option value="40">大きい文字</option></select></div><div class="row"><input id="mapText" placeholder="文字を入力 → 地図をタップ" maxlength="60" style="flex:1;min-width:150px"><button id="putText">文字を置く</button></div><div class="row" id="editTargets" aria-label="編集する対象"></div><p id="editingLabel" class="badge"></p><canvas id="map" width="1000" height="986" aria-label="作戦図。ルートモードでドラッグして描画"></canvas><div class="row"><button id="play" class="primary">▶ 再生</button><button id="pause">一時停止</button><button id="reset">先頭へ</button></div><input id="seek" type="range" min="0" max="1" step=".001" value="0" aria-label="再生位置"><div class="hint">選んだ部隊の出発地点から、進軍ルートを指でなぞってください。</div></section>
 <aside class="panel"><div id="castlePanel" hidden><p class="badge">攻め＝青／守り＝赤<br>攻略目標：城壁・楼城</p><label>井闌車を選ぶ</label><select id="warehouse"></select><input id="capture" type="number" value="0" hidden><label>井闌車の線の終点（画像上端から％）</label><input id="siegeEnd" type="number" min="0" max="100" value="12"><input id="siegeTime" type="number" value="20" hidden><div class="row"><button id="placeSiege">井闌車を置く</button><button id="deleteWarehouse">井闌車を削除</button></div><p class="hint">井闌車は配置マークと真上の線だけを表示し、再生中も動きません。線の終点は配置場所より上に設定してください。</p><div class="row"><button id="newSiege">単独の井闌車を追加</button></div><hr></div><p id="fortGoal" class="badge">攻略目標：敵総大将</p><label>作戦の部隊数</label><select id="count"><option value="1">Aのみ</option><option value="2">A・B</option><option value="3">A・B・C</option><option value="4">A・B・C・D</option></select><label>② 部隊を選ぶ</label><div class="row units" id="units"></div><label>この部隊の進み方</label><select id="split"><option value="1">1ルート</option><option value="2">二手に分ける（2ルート）</option><option value="3">三手に分ける（3ルート）</option></select><div class="row" id="branchButtons" hidden><button id="branch1">ルート1</button><button id="branch2">ルート2</button><button id="branch3">ルート3</button></div><div id="branchHint" class="hint"></div><label>到着後の行動</label><select id="arrivalAction"><option value="attack">攻撃する</option><option value="defend">防衛する（盾マーク）</option></select><p class="hint">ルートごとに設定できます。防衛は盾と「防衛」の表示で区別します。</p><label>選択ルートの人数</label><input id="people" type="number" min="0" max="999" placeholder="未入力なら表示しません"><label>出発までの待ち時間（秒）</label><input id="delay" type="number" min="0" max="120" value="0"><label>途中の待機時間（秒）</label><input id="hold" type="number" min="0" max="120" value="0"><label>待機する位置 <span id="holdLabel">50</span>％</label><input id="holdAt" type="range" min="0" max="100" value="50"><p class="hint">待機地点はスライダー、または「待機地点を指定」でルート上をタップして選べます。待機後は自動で再出発します。</p><label>③ 書き込み方法</label><select id="mode"><option value="route">進軍ルート（指でなぞる）</option><option value="free">自由線（指で描く）</option><option value="note">文字（地点をタップ）</option><option value="placeSiege">井闌車を置く（城・真上に線）</option><option value="enemyBoss">敵総大将を置く（タップ）</option><option value="enemyStrong">強敵を置く（タップ）</option><option value="enemyErase">敵マークを消す（タップ）</option><option value="wait">待機地点を指定（ルート上をタップ）</option><option value="ring">強調 ◎（地点をタップ）</option></select><input id="note" placeholder="例：詰所・森を封鎖" maxlength="30" style="margin-top:8px;width:100%"><p class="hint">ルートは出発地点から到着地点へなぞります。選択したルートを描き直します。二手に分けるときは、各ルートをそれぞれ描いてください。同じ出発地点から描けば二方向へ分かれて進みます。</p><div class="row"><button id="undo">一つ戻す</button><button id="clearUnit">選択ルート削除</button></div><label>再生速度</label><select id="rate"><option value="1" selected>1倍速</option><option value="2">2倍速</option><option value="4">4倍速</option><option value="8">8倍速</option></select><label>部隊の移動時間 <span id="seconds">12</span>秒</label><input id="duration" type="range" min="4" max="30" value="12"><p class="hint" id="totalTime"></p><hr><div class="row"><label>動画に入れる音声</label><input id="audioUpload" type="file" accept="audio/*"><audio id="audioPreview" controls hidden style="width:100%;margin:8px 0"></audio><div class="row"><button id="useFixedAudio">固定音声に戻す</button><button id="clearAudio">音声を外す</button></div><p id="audioInfo" class="hint">音声なし。MP3・M4A・WAVなどを選択できます。</p><p class="hint">固定音声は最初から設定されています。別の音声を選んだ場合、その音声は作戦JSONに含まれません。</p><section style="padding:12px;border:1px solid #708c9b;border-radius:10px;margin:10px 0">
-<strong>🎙 軍師の声｜作戦解説を録音</strong><p style="color:#f5d38b;font-weight:bold" id="countdownVersion">音声3モード版 v6｜録音復旧・状態表示付き</p><p class="hint">録音は常に軍師の声だけです。BGMは動画を書き出すときに合成します。</p>
+<strong>🎙 軍師の声｜作戦解説を録音</strong><p style="color:#f5d38b;font-weight:bold" id="countdownVersion">WAV録音修正版 v8｜5秒カウントダウン・音声3モード</p><p class="hint">録音は常に軍師の声だけです。BGMは動画を書き出すときに合成します。</p>
 <div id="recordCountdown" class="record-countdown" hidden aria-live="polite"><div id="countNumber">5</div><p>録音開始まで</p><button id="cancelCountdown" type="button">キャンセル</button></div><div id="recLive" class="rec-live" hidden aria-live="polite">● REC　録音中</div><div class="row"><button id="narrateStart" class="primary">🎙 5秒後に録音・再生</button><button id="narrateStop" disabled>■ 録音終了</button><button id="narrateClear" disabled>録音を削除</button></div>
 <p id="voiceCheck" class="hint" style="color:#f1c56d">①声を録音 → ②録音の▶を試聴 → ③動画を書き出す。まずBGMオフで確認してください。</p><p id="narrateStatus" class="hint" role="status" aria-live="polite">まだ軍師の声は録音されていません。録音後に動画へ合成できます。</p>
 <audio id="narratePreview" controls hidden style="width:100%"></audio>
@@ -62,7 +62,7 @@ $('png').onclick=()=>canvas.toBlob(b=>download(b,'作戦図.png'));$('save').onc
 function setImage(src){status('画像を読み込んでいます…');image.onload=()=>{imageSrc=src;canvas.height=Math.round(1000*image.naturalHeight/image.naturalWidth);$('startScreen').hidden=true;$('editor').hidden=false;draw();status('部隊数を選び、ルートを描いてください。')};image.onerror=()=>status('画像を読み込めませんでした。別の画像を選んでください。');image.src=src}
 $('json').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());if(!d.plan||d.plan.routes.length!==4||!d.plan.routes.every(r=>Array.isArray(r)&&r.every(p=>p.length===2&&p.every(v=>Number.isFinite(v)&&v>=0&&v<=1)))||!Array.isArray(d.plan.notes)||!Array.isArray(d.plan.rings)||typeof d.imageSrc!=='string'||(!d.imageSrc.startsWith('data:image/')&&d.imageSrc!=='map.jpg'))throw Error();if(!d.plan.secondary)d.plan.secondary=[[],[],[],[]];if(!d.plan.tertiary)d.plan.tertiary=[[],[],[],[]];if(!d.plan.splits)d.plan.splits=[1,1,1,1];if(d.plan.secondary.length!==4||d.plan.tertiary.length!==4||![...d.plan.secondary,...d.plan.tertiary].every(r=>Array.isArray(r)&&r.every(p=>Array.isArray(p)&&p.length===2&&p.every(v=>Number.isFinite(v)&&v>=0&&v<=1)))||d.plan.splits.length!==4||!d.plan.splits.every(v=>v===1||v===2||v===3))throw Error();if(!d.plan.settings)d.plan.settings=initial().settings;if(d.plan.settings.length!==4||!d.plan.settings.every(row=>Array.isArray(row)&&row.length===3&&row.every(s=>s&&['delay','hold','holdAt'].every(k=>Number.isFinite(s[k])&&s[k]>=0&&s[k]<=(k==='holdAt'?1:120))&&(s.people===null||(Number.isInteger(s.people)&&s.people>=0&&s.people<=999)))))throw Error();if(!d.plan.enemies)d.plan.enemies=[];if(!Array.isArray(d.plan.enemies)||!d.plan.enemies.every(o=>o&&['boss','strong'].includes(o.type)&&Array.isArray(o.p)&&o.p.length===2&&o.p.every(v=>Number.isFinite(v)&&v>=0&&v<=1)))throw Error();if(!d.plan.warehouses)d.plan.warehouses=[];if(!d.plan.targets)d.plan.targets=[];if(!['fort','castle'].includes(d.plan.battlefield))d.plan.battlefield='fort';validateCastle(d.plan);validateAnnotations(d.plan);snapshot();plan=d.plan;$('count').value=[1,2,3,4].includes(d.count)?String(d.count):'4';selected=0;highlight();$('battlefield').value=plan.battlefield;$('rate').value=[1,2,4,8].includes(d.rate)?String(d.rate):'1';syncCastle();playing=false;progress=0;$('duration').value=Math.max(4,Math.min(30,d.duration||12));$('seconds').textContent=$('duration').value;setImage(d.imageSrc);status('作戦を読み込みました。')}catch{status('作戦ファイルを確認してください。')}e.target.value=''};
 $('upload').onchange=e=>{if(recording)return;const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{history=[];plan=initial();selected=0;highlight();playing=false;progress=0;setImage(r.result)};r.readAsDataURL(f)};$('sample').onclick=()=>{if(recording)return;snapshot();plan=initial();selected=0;highlight();progress=0;playing=false;draw()};
-$('record').onclick=async()=>{if(recording)return;if(!canvas.captureStream||!window.MediaRecorder){status('この端末では動画書き出し非対応です。画面収録をご利用ください。');return}const mime=['video/mp4','video/webm;codecs=vp9','video/webm'].find(m=>MediaRecorder.isTypeSupported(m));if(!mime){status('この端末では動画書き出しに対応していません。');return}let stream,rec,audioSession;try{stream=canvas.captureStream(30);audioSession=await prepareVideoAudio(stream);rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:5000000})}catch(err){status('動画の録画を開始できません：'+(err.message||'音声や端末の対応をご確認ください')); if(audioSession)audioSession.cleanup();if(stream)stream.getTracks().forEach(t=>t.stop());return}recording=true;const controls=[...document.querySelectorAll('button,input,select')];controls.forEach(c=>c.disabled=true);let chunks=[],timer;function cleanup(){clearTimeout(timer);if(audioSession)audioSession.cleanup();stream.getTracks().forEach(t=>t.stop());recording=false;playing=false;controls.forEach(c=>c.disabled=false)}rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};rec.onstop=()=>{cleanup();download(new Blob(chunks,{type:mime}),'作戦動画.'+(mime.includes('mp4')?'mp4':'webm'));status('動画を保存しました。')};rec.onerror=()=>{cleanup();status('録画に失敗しました。画面収録をご利用ください。')};progress=0;draw();rec.start();if(audioSession)audioSession.play();start=performance.now();playing=true;status('動画を書き出しています… この画面を開いたままお待ちください。');timer=setTimeout(()=>{if(rec.state==='recording')rec.stop()},Math.max(totalSeconds()/+$('rate').value,audioSession?.duration||0)*1000+500)};
+$('record').onclick=async()=>{if(recording)return;if(!canvas.captureStream||!window.MediaRecorder){status('この端末では動画書き出し非対応です。画面収録をご利用ください。');return}const mime=['video/mp4','video/webm;codecs=vp9','video/webm'].find(m=>MediaRecorder.isTypeSupported(m));if(!mime){status('この端末では動画書き出しに対応していません。');return}let stream,rec,audioSession;try{stream=canvas.captureStream(30);audioSession=await prepareVideoAudio(stream);rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:5000000})}catch(err){status('動画の録画を開始できません：'+(err.message||'音声や端末の対応をご確認ください')); if(audioSession)audioSession.cleanup();if(stream)stream.getTracks().forEach(t=>t.stop());return}recording=true;const controls=[...document.querySelectorAll('button,input,select')];controls.forEach(c=>c.disabled=true);let chunks=[],timer;function cleanup(){clearTimeout(timer);if(audioSession)audioSession.cleanup();stream.getTracks().forEach(t=>t.stop());recording=false;playing=false;controls.forEach(c=>c.disabled=false)}rec.ondataavailable=e=>{if(e.data&&e.data.size>0)chunks.push(e.data)};rec.onstop=()=>{cleanup();download(new Blob(chunks,{type:mime}),'作戦動画.'+(mime.includes('mp4')?'mp4':'webm'));status('動画を保存しました。')};rec.onerror=()=>{cleanup();status('録画に失敗しました。画面収録をご利用ください。')};progress=0;draw();rec.start();if(audioSession)audioSession.play();start=performance.now();playing=true;status('動画を書き出しています… この画面を開いたままお待ちください。');timer=setTimeout(()=>{if(rec.state==='recording')rec.stop()},Math.max(totalSeconds()/+$('rate').value,audioSession?.duration||0)*1000+500)};
 $('chooseStart').onclick=$('chooseChange').onclick=()=>{if(!recording)$('upload').click()};$('loadStart').onclick=()=> $('json').click();
 
 </script><script>
@@ -111,81 +111,131 @@ for(const id of ['pause','reset']){const before=$(id).onclick;$(id).onclick=()=>
 
 </script><script>
 // Narration extension for standalone しらす式作戦図
-let narrationBlob=null, narrationURL=null, narrationRate=1, narrationRecorder=null;
+let narrationBlob=null,narrationURL=null,narrationRate=1;
 let narrationMic=null,narrationWatch=0,narrationBusy=false;
 let narrationCountdownTimer=null,narrationPreparing=false,narrationCancelled=false;
-function stopNarrationCountdown(){if(narrationCountdownTimer!==null){clearInterval(narrationCountdownTimer);narrationCountdownTimer=null;}$('recordCountdown').hidden=true}
-function cancelNarrationCountdown(){
- narrationCancelled=true;stopNarrationCountdown();narrationPreparing=false;narrationBusy=false;
- if(narrationMic){narrationMic.getTracks().forEach(t=>t.stop());narrationMic=null}
- narrationRecorder=null;$('recLive').hidden=true;
- narrationUI('録音開始をキャンセルしました。');
+let narrationContext=null,narrationSource=null,narrationProcessor=null,narrationSilence=null;
+let pcmBlocks=[],pcmSamples=0,captureActive=false;
+function stopNarrationCountdown(){
+ if(narrationCountdownTimer!==null){clearInterval(narrationCountdownTimer);narrationCountdownTimer=null;}
+ $('recordCountdown').hidden=true;
 }
-$('cancelCountdown').onclick=cancelNarrationCountdown;
-function narrationUI(message){$('narrateStatus').textContent=message;
+function narrationUI(message){
+ $('narrateStatus').textContent=message;
  $('narrateStart').disabled=narrationBusy||narrationPreparing||recording;
  $('narrateStop').disabled=!narrationBusy;
  $('narrateClear').disabled=narrationBusy||!narrationBlob;
 }
-function clearNarration(){if(narrationURL)URL.revokeObjectURL(narrationURL);narrationURL=null;narrationBlob=null;$('narratePreview').hidden=true;$('narratePreview').removeAttribute('src');$('narratePreview').load();narrationUI('録音なし。')}
-$('narrateClear').onclick=clearNarration;
-function finishNarration(){if(!narrationBusy)return;narrationBusy=false;$('recLive').hidden=true;cancelAnimationFrame(narrationWatch);
- if(narrationRecorder&&narrationRecorder.state!=='inactive')narrationRecorder.stop();
+function releaseNarrationMic(){
+ captureActive=false;
+ if(narrationProcessor){narrationProcessor.onaudioprocess=null;try{narrationProcessor.disconnect()}catch{} narrationProcessor=null;}
+ if(narrationSource){try{narrationSource.disconnect()}catch{} narrationSource=null;}
+ if(narrationSilence){try{narrationSilence.disconnect()}catch{} narrationSilence=null;}
  if(narrationMic){narrationMic.getTracks().forEach(t=>t.stop());narrationMic=null;}
- playing=false;draw();narrationUI('録音を処理しています…');}
+ if(narrationContext){const ctx=narrationContext;narrationContext=null;ctx.close().catch(()=>{});}
+ $('recLive').hidden=true;
+}
+function cancelNarrationCountdown(){
+ narrationCancelled=true;stopNarrationCountdown();narrationPreparing=false;narrationBusy=false;
+ releaseNarrationMic();narrationUI('録音開始をキャンセルしました。');
+}
+$('cancelCountdown').onclick=cancelNarrationCountdown;
+function clearNarration(){
+ if(narrationURL)URL.revokeObjectURL(narrationURL);
+ narrationURL=null;narrationBlob=null;
+ $('narratePreview').hidden=true;$('narratePreview').removeAttribute('src');$('narratePreview').load();
+ narrationUI('録音なし。');
+}
+$('narrateClear').onclick=clearNarration;
+function pcmToWave(blocks,n,sampleRate){
+ // Uncompressed mono PCM WAV works with Safari and Web Audio decoding.
+ const out=new ArrayBuffer(44+n*2),view=new DataView(out);
+ const ascii=(offset,value)=>{for(let i=0;i<value.length;i++)view.setUint8(offset+i,value.charCodeAt(i));};
+ ascii(0,'RIFF');view.setUint32(4,36+n*2,true);ascii(8,'WAVE');
+ ascii(12,'fmt ');view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,1,true);
+ view.setUint32(24,sampleRate,true);view.setUint32(28,sampleRate*2,true);
+ view.setUint16(32,2,true);view.setUint16(34,16,true);
+ ascii(36,'data');view.setUint32(40,n*2,true);
+ let j=44;
+ for(const block of blocks)for(let i=0;i<block.length;i++){
+  const v=Math.max(-1,Math.min(1,block[i]));
+  view.setInt16(j,v<0?v*32768:v*32767,true);j+=2;
+ }
+ return new Blob([out],{type:'audio/wav'});
+}
+function finishNarration(){
+ if(!narrationBusy)return;
+ captureActive=false;narrationBusy=false;
+ cancelAnimationFrame(narrationWatch);playing=false;draw();
+ const blocks=pcmBlocks,n=pcmSamples,rate=narrationContext?.sampleRate||44100;
+ pcmBlocks=[];pcmSamples=0;
+ releaseNarrationMic();
+ if(n<rate/4){narrationUI('録音データがありません。マイク許可・端末の音声入力を確認してください。');return;}
+ try{
+  const blob=pcmToWave(blocks,n,rate);
+  if(narrationURL)URL.revokeObjectURL(narrationURL);
+  narrationBlob=blob;narrationURL=URL.createObjectURL(blob);
+  $('narratePreview').src=narrationURL;$('narratePreview').hidden=false;$('narratePreview').load();
+  narrationUI('軍師の声を保存しました（'+Math.round(blob.size/1024)+'KB / '+(n/rate).toFixed(1)+'秒）。▶で声を確認してください。');
+ }catch(e){narrationUI('録音の保存に失敗しました：'+(e.message||e));}
+}
 $('narrateStop').onclick=finishNarration;
-function narrationMonitor(){if(!narrationBusy)return;
- if(progress>=1){finishNarration();return}
+function narrationMonitor(){
+ if(!narrationBusy)return;
+ if(progress>=1){finishNarration();return;}
  narrationWatch=requestAnimationFrame(narrationMonitor);
 }
 $('narrateStart').onclick=async()=>{
- if(recording){narrationUI('動画書き出し中は録音できません。終了までお待ちください。');return}
- if(narrationBusy){narrationUI('現在録音中です。「録音終了」を押してください。');return}
- if(narrationPreparing){narrationUI('マイク準備中またはカウントダウン中です。');return}
- if(!imageSrc){status('先に作戦のスクショを読み込んでください。');return}
- if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){narrationUI('このブラウザはマイク録音に対応していません。iPhoneのSafariでHTTPSの公開ページを開いてください。');return}
- narrationCancelled=false;narrationPreparing=true;narrationUI('マイクの利用を許可してください。');
- try {
+ if(recording){narrationUI('動画書き出し中は録音できません。');return;}
+ if(narrationBusy||narrationPreparing){narrationUI('すでに録音の準備中・録音中です。');return;}
+ if(!imageSrc){status('先に作戦のスクショを読み込んでください。');return;}
+ const AC=window.AudioContext||window.webkitAudioContext;
+ if(!navigator.mediaDevices?.getUserMedia||!AC){narrationUI('このブラウザは音声録音に対応していません。iPhoneのSafariで開いてください。');return;}
+ narrationPreparing=true;narrationCancelled=false;narrationUI('マイクの利用を許可してください。');
+ try{
   const mic=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true},video:false});
-  if(narrationCancelled){mic.getTracks().forEach(t=>t.stop());narrationPreparing=false;narrationUI('録音開始をキャンセルしました。');return}
-  const mime=['audio/mp4','audio/webm;codecs=opus','audio/webm'].find(x=>typeof MediaRecorder.isTypeSupported==='function'&&MediaRecorder.isTypeSupported(x));
-  const rec=mime?new MediaRecorder(mic,{mimeType:mime}):new MediaRecorder(mic);
-  narrationMic=mic;narrationRecorder=rec;narrationRate=+$('rate').value;
-  // The previous recording remains intact until the countdown completes.
-  const chunks=[];rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
-  rec.onstop=()=>{if(!chunks.length){narrationUI('音声データを保存できませんでした。もう一度録音してください。');return}
-   narrationBlob=new Blob(chunks,{type:rec.mimeType||'audio/mp4'});
-   narrationURL=URL.createObjectURL(narrationBlob);
-   $('narratePreview').src=narrationURL;$('narratePreview').hidden=false;
-   narrationUI('軍師の声の録音を保存しました（'+Math.round(narrationBlob.size/1024)+'KB）。▶で声が聞こえるか確認してから動画を書き出してください。');};
-  rec.onerror=()=>{narrationBusy=false;$('recLive').hidden=true;mic.getTracks().forEach(t=>t.stop());narrationUI('マイク録音に失敗しました。')};
-  $('audioPreview').pause();$('narratePreview').pause();
-  playing=false;progress=0;draw();
-  // The recorder must not begin until the countdown reaches zero.
-  let remaining=5;$('countNumber').textContent=remaining;
-  $('recordCountdown').hidden=false;
-  narrationUI('5秒後に録音と部隊の再生を同時に開始します。準備中は録音されません。');
+  if(narrationCancelled){mic.getTracks().forEach(t=>t.stop());return;}
+  narrationMic=mic;
+  const ctx=new AC();narrationContext=ctx;
+  if(!ctx.createScriptProcessor)throw Error('音声収録機能が利用できません。');
+  const source=ctx.createMediaStreamSource(mic),processor=ctx.createScriptProcessor(4096,1,1);
+  const mute=ctx.createGain();mute.gain.value=0;
+  narrationSource=source;narrationProcessor=processor;narrationSilence=mute;
+  pcmBlocks=[];pcmSamples=0;captureActive=false;
+  processor.onaudioprocess=e=>{
+   if(!captureActive)return;
+   const data=e.inputBuffer.getChannelData(0);
+   const copy=new Float32Array(data.length);copy.set(data);
+   pcmBlocks.push(copy);pcmSamples+=copy.length;
+  };
+  source.connect(processor);processor.connect(mute);mute.connect(ctx.destination);
+  await ctx.resume();
+  if(narrationCancelled)return;
+  if(ctx.state!=='running')throw Error('録音用の音声処理が開始できません（'+ctx.state+'）。');
+  narrationRate=+$('rate').value;
+  $('audioPreview').pause();$('narratePreview').pause();playing=false;progress=0;draw();
+  let remaining=5;$('countNumber').textContent=remaining;$('recordCountdown').hidden=false;
+  narrationUI('5秒後に録音と部隊の再生を同時開始します。BGMは録音に入りません。');
   narrationCountdownTimer=setInterval(()=>{
-   if(narrationCancelled){stopNarrationCountdown();return}
+   if(narrationCancelled){stopNarrationCountdown();return;}
    remaining--;
-   if(remaining>0){$('countNumber').textContent=remaining;return}
+   if(remaining>0){$('countNumber').textContent=remaining;return;}
    stopNarrationCountdown();narrationPreparing=false;
    if(narrationCancelled)return;
    try{
-    if(narrationURL)URL.revokeObjectURL(narrationURL);
-    narrationURL=null;narrationBlob=null;$('narratePreview').hidden=true;
-    rec.start(250);narrationBusy=true;$('recLive').hidden=false;
-    // Begin timeline immediately after microphone recorder starts. Keep BGM silent during narration.
+    if(narrationURL){URL.revokeObjectURL(narrationURL);narrationURL=null;}
+    narrationBlob=null;$('narratePreview').hidden=true;
+    // Enable audio samples before starting the timeline.
+    pcmBlocks=[];pcmSamples=0;captureActive=true;narrationBusy=true;$('recLive').hidden=false;
     const prevURL=selectedAudioURL;selectedAudioURL=null;
-    try{silentPlay()}finally{selectedAudioURL=prevURL}
-    narrationUI('● REC 録音中：作戦に合わせて話してください。「録音終了」で停止できます。');
+    try{silentPlay()}finally{selectedAudioURL=prevURL;}
+    narrationUI('● REC 軍師の声を録音中（BGMなし）。録音終了後に試聴できます。');
     narrationWatch=requestAnimationFrame(narrationMonitor);
-   }catch(e){narrationBusy=false;$('recLive').hidden=true;mic.getTracks().forEach(t=>t.stop());narrationMic=null;narrationUI('録音を開始できません：'+(e.message||e))}
+   }catch(e){narrationBusy=false;releaseNarrationMic();narrationUI('録音を開始できません：'+(e.message||e));}
   },1000);
  }catch(e){
-  stopNarrationCountdown();narrationPreparing=false;
-  if(narrationMic){narrationMic.getTracks().forEach(t=>t.stop());narrationMic=null}
-  narrationUI('録音できません：'+(e.name||'エラー')+' '+(e.message||'マイクの権限を確認してください。'));
+  stopNarrationCountdown();narrationPreparing=false;releaseNarrationMic();
+  narrationUI('録音できません：'+(e.name||'エラー')+' '+(e.message||''));
  }
 };
 // Prevent timeline changes and video export while recording spoken commentary.
